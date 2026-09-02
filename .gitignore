@@ -3,6 +3,18 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .kotlin
+.idea/
+*.iml
+
+### Python ###
+.venv/
+__pycache__/
+*.pyc
+.env
+
+### Data ###
+data/
+*.sql
 
 ### Eclipse ###
 .apt_generated
@@ -28,3 +40,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
