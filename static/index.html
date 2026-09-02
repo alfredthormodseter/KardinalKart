@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="crossorigin=""></script>
     <style>
-        #map { height: 800px; width: 600px }
+        #map { height: 800px; width: 800px }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
@@ -15,66 +15,96 @@
 
     <h1>FangstPlot</h1>
     <div id="result"></div>
+    <label>Kantlengd:
+        <select id="cellSize">
+            <option value="10">10 m</option>
+            <option value="20" selected>20 m</option>
+            <option value="50">50 m</option>
+            <option value="100">100 m</option>
+        </select>
+    </label>
     <div id="map"></div>
     <script type="text/javascript">
-        var map = L.map('map').setView([60.14,10.25],9);
+        var map = L.map('map', { preferCanvas: true }).setView([59.71, 5.05], 13);
         L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topograatone/default/webmercator/{z}/{y}/{x}.png', {
-        attribution: '&copy; <a href="http://www.kartverket.no/">Kartverket</a>'
+            attribution: '&copy; <a href="http://www.kartverket.no/">Kartverket</a>'
         }).addTo(map);
 
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
+        var gridlag = null;
 
-        var drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: drawnItems,
-                edit: false,
-                remove: false
-            },
+        map.addControl(new L.Control.Draw({
+            edit: { featureGroup: drawnItems, edit: false, remove: false },
             draw: {
                 polygon: true,
-                polyline: false,
-                rectangle: false,
-                circle: false,
-                marker: false,
-                circlemarker: false
+                polyline: false, rectangle: false,
+                circle: false, marker: false, circlemarker: false
             }
-        });
-        map.addControl(drawControl);
+        }));
 
-        map.on('draw:created', function(e) {
-            var layer = e.layer;
-            drawnItems.addLayer(layer);
+        function farge(d) {
+            if (d === null) return '#ccc';
+            return d < 10  ? '#c6e6ff' :
+                   d < 20  ? '#7fc4f0' :
+                   d < 30  ? '#4a9fd8' :
+                   d < 50  ? '#2b7ab5' :
+                   d < 100 ? '#1a5490' : '#0d2e52';
+        }
 
-            // Hent GeoJSON frå mangekanten
-            var geoJson = layer.toGeoJSON();
-            console.log(geoJson);
+        map.on('draw:created', async function (e) {
+            drawnItems.clearLayers();
+            drawnItems.addLayer(e.layer);
+            if (gridlag) map.removeLayer(gridlag);
 
-            // Send til backend (seinare)
-        });
+            var ring = e.layer.toGeoJSON().geometry.coordinates[0];
+            var status = document.getElementById('result');
+            status.innerText = 'Reknar …';
 
-        map.on('draw:created', function(e) {
-            var layer = e.layer;
-            drawnItems.addLayer(layer);
+            try {
+                var svar = await fetch('/create-grid', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        coordinates: ring,
+                        cell_size: Number(document.getElementById('cellSize').value)
+                    })
+                });
 
-            var geoJson = layer.toGeoJSON();
-            console.log(geoJson);
+                if (!svar.ok) {
+                    var feil = await svar.json();
+                    status.innerText = feil.detail || 'Noko gjekk gale';
+                    return;
+                }
 
-            // Send til backend
-            fetch('/create-grid', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    coordinates: geoJson.geometry.coordinates
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Grids:', data.grids);
-                document.getElementById('result').innerText = `Grids created: ${data.grids.length}`;
-            });
+                var cells = (await svar.json()).cells;
+                if (cells.length === 0) {
+                    status.innerText = 'Ingen djupnedata i omrisset';
+                    return;
+                }
+
+                gridlag = L.geoJSON({
+                    type: 'FeatureCollection',
+                    features: cells.map(c => ({
+                        type: 'Feature',
+                        geometry: c.geom,
+                        properties: { i: c.i, j: c.j, djupne: c.djupne }
+                    }))
+                }, {
+                    style: f => ({
+                        fillColor: farge(f.properties.djupne),
+                        fillOpacity: 0.6, color: '#333', weight: 0.3
+                    }),
+                    onEachFeature: (f, lag) => {
+                        var p = f.properties;
+                        lag.bindTooltip((p.djupne ?? '–') + ' m');
+                    }
+                }).addTo(map);
+
+                status.innerText = cells.length + ' celler';
+            } catch (err) {
+                status.innerText = 'Feil: ' + err.message;
+            }
         });
     </script>
 </body>
