@@ -10,11 +10,11 @@ out/
 .venv/
 __pycache__/
 *.pyc
-.env
 
 ### Data ###
 data/
 *.sql
+.env
 
 ### Eclipse ###
 .apt_generated
