@@ -2,8 +2,8 @@ services:
   db:
     image: postgis/postgis:16-3.4
     environment:
-      POSTGRES_USER: fangst
-      POSTGRES_PASSWORD: fangst
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD
       POSTGRES_DB: fangstplot
     ports:
       - "5432:5432"
