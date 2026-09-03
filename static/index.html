@@ -25,7 +25,7 @@
     </label>
     <div id="map"></div>
     <script type="text/javascript">
-        var map = L.map('map', { preferCanvas: true }).setView([59.71, 5.05], 13);
+        var map = L.map('map', { preferCanvas: true }).setView([59.75, 5.25], 11);
         L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topograatone/default/webmercator/{z}/{y}/{x}.png', {
             attribution: '&copy; <a href="http://www.kartverket.no/">Kartverket</a>'
         }).addTo(map);
@@ -59,7 +59,7 @@
 
             var ring = e.layer.toGeoJSON().geometry.coordinates[0];
             var status = document.getElementById('result');
-            status.innerText = 'Reknar …';
+            status.innerText = 'Lastar varmekart…';
 
             try {
                 var svar = await fetch('/create-grid', {
@@ -88,7 +88,16 @@
                     features: cells.map(c => ({
                         type: 'Feature',
                         geometry: c.geom,
-                        properties: { i: c.i, j: c.j, djupne: c.djupne }
+                        properties: {
+                            i: c.i, j: c.j,
+                            djupne: c.djupne,
+                            maalt_djupne: c.maalt_djupne,
+                            tal_punkt: c.tal_punkt,
+                            grunnaste: c.grunnaste,
+                            tal_grunner: c.tal_grunner,
+                            tal_skjer: c.tal_skjer,
+                            fall: c.fall
+                        }
                     }))
                 }, {
                     style: f => ({
@@ -97,7 +106,13 @@
                     }),
                     onEachFeature: (f, lag) => {
                         var p = f.properties;
-                        lag.bindTooltip((p.djupne ?? '–') + ' m');
+                        lag.bindTooltip(
+                            'Djupne: ' + (p.djupne ?? '–') + ' m<br>' +
+                            'Målt djupne: ' + (p.maalt_djupne ?? '–') + ' m (' + p.tal_punkt + ' punkt)<br>' +
+                            'Grunnaste: ' + (p.grunnaste ?? '–') + ' m (' + p.tal_grunner + ' grunner)<br>' +
+                            'Skjer: ' + p.tal_skjer + '<br>' +
+                            'Fall: ' + p.fall + ' m'
+                        );
                     }
                 }).addTo(map);
 

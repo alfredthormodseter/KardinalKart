@@ -6,6 +6,7 @@ from app.grid import hent_celler
 
 app = FastAPI()
 
+#Sjekkar om create_grid kan bli kalla
 class PolygonRequest(BaseModel):
     coordinates: list[tuple[float, float]] = Field(min_length=4)
     cell_size: float = Field(default=20.0, ge=5, le=500)
@@ -18,6 +19,7 @@ async def read_root():
 def get_catches():
     return {"catches": []}
 
+#Brukar hent_celler til å lage eit grid
 @app.post("/create-grid")
 def create_grid(req: PolygonRequest):
     return {"cells": hent_celler(req.coordinates, req.cell_size)}
