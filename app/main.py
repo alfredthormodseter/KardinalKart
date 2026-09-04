@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
@@ -9,7 +9,6 @@ app = FastAPI()
 #Sjekkar om create_grid kan bli kalla
 class PolygonRequest(BaseModel):
     coordinates: list[tuple[float, float]] = Field(min_length=4)
-    cell_size: float = Field(default=20.0, ge=5, le=500)
 
 @app.get("/")
 async def read_root():
@@ -22,7 +21,10 @@ def get_catches():
 #Brukar hent_celler til å lage eit grid
 @app.post("/create-grid")
 def create_grid(req: PolygonRequest):
-    return {"cells": hent_celler(req.coordinates, req.cell_size)}
+    try:
+        return {"cells": hent_celler(req.coordinates)}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

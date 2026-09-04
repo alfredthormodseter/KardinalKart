@@ -15,14 +15,6 @@
 
     <h1>FangstPlot</h1>
     <div id="result"></div>
-    <label>Kantlengd:
-        <select id="cellSize">
-            <option value="10">10 m</option>
-            <option value="20" selected>20 m</option>
-            <option value="50">50 m</option>
-            <option value="100">100 m</option>
-        </select>
-    </label>
     <div id="map"></div>
     <script type="text/javascript">
         var map = L.map('map', { preferCanvas: true }).setView([59.75, 5.25], 11);
@@ -44,7 +36,7 @@
         }));
 
         function farge(d) {
-            if (d === null) return '#ccc';
+            if (d == null) return '#ccc';
             return d < 10  ? '#c6e6ff' :
                    d < 20  ? '#7fc4f0' :
                    d < 30  ? '#4a9fd8' :
@@ -65,23 +57,16 @@
                 var svar = await fetch('/create-grid', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        coordinates: ring,
-                        cell_size: Number(document.getElementById('cellSize').value)
-                    })
+                    body: JSON.stringify({ coordinates: ring })
                 });
 
                 if (!svar.ok) {
-                    var feil = await svar.json();
-                    status.innerText = feil.detail || 'Noko gjekk gale';
-                    return;
+                    var feil = await svar.json().catch(() => ({}));
+                    throw new Error(feil.detail || ('HTTP ' + svar.status));
                 }
 
-                var cells = (await svar.json()).cells;
-                if (cells.length === 0) {
-                    status.innerText = 'Ingen djupnedata i omrisset';
-                    return;
-                }
+                var data = await svar.json();
+                var cells = data.cells;
 
                 gridlag = L.geoJSON({
                     type: 'FeatureCollection',
@@ -91,11 +76,10 @@
                         properties: {
                             i: c.i, j: c.j,
                             djupne: c.djupne,
-                            maalt_djupne: c.maalt_djupne,
-                            tal_punkt: c.tal_punkt,
-                            grunnaste: c.grunnaste,
-                            tal_grunner: c.tal_grunner,
-                            tal_skjer: c.tal_skjer,
+                            djupnepunkt: c.punkt,
+                            grunner: c.grunner,
+                            skjer: c.tal_skjer,
+                            kurver: c.tal_kurver,
                             fall: c.fall
                         }
                     }))
@@ -108,10 +92,10 @@
                         var p = f.properties;
                         lag.bindTooltip(
                             'Djupne: ' + (p.djupne ?? '–') + ' m<br>' +
-                            'Målt djupne: ' + (p.maalt_djupne ?? '–') + ' m (' + p.tal_punkt + ' punkt)<br>' +
-                            'Grunnaste: ' + (p.grunnaste ?? '–') + ' m (' + p.tal_grunner + ' grunner)<br>' +
-                            'Skjer: ' + p.tal_skjer + '<br>' +
-                            'Fall: ' + p.fall + ' m'
+                            'Djupnepunkt: ' + p.djupnepunkt.length + '<br>' +
+                            'Grunnaste: ' + (p.grunner[0] ?? '–') + ' m (' + p.grunner.length + ' grunner)<br>' +
+                            'Skjer: ' + p.skjer + '<br>' +
+                            'Kurver: ' + p.kurver + ', fall: ' + p.fall + ' m'
                         );
                     }
                 }).addTo(map);
