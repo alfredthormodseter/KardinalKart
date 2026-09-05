@@ -2,8 +2,8 @@ import json
 from sqlalchemy import text
 from app.db import engine
 
-MAKS_CELLER = 20_000
-CELLESTORLEIK = 20.0
+MAKS_CELLER = 10_000 #Ca.
+CELLESTORLEIK = 30.0
 
 ESTIMAT = text("""
     SELECT ST_Area(ST_Transform(ST_MakeValid(ST_GeomFromText(:wkt, 4326)), 25832))

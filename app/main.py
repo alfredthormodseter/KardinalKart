@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from app.grid import hent_celler
+from app.kalkulering import score_celler
 
 app = FastAPI()
 
@@ -22,9 +23,14 @@ def get_catches():
 @app.post("/create-grid")
 def create_grid(req: PolygonRequest):
     try:
-        return {"cells": hent_celler(req.coordinates)}
+        celler = score_celler(hent_celler(req.coordinates))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+    return {
+        "cells": celler,
+        "maks_poeng": max((c["poeng"] for c in celler), default=0.0),
+    }
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

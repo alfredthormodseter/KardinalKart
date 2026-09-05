@@ -7,104 +7,126 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="crossorigin=""></script>
     <style>
         #map { height: 800px; width: 800px }
+        .tooltip-tabell { font-size: 11px; border-collapse: collapse }
+        .tooltip-tabell td { padding: 0 4px 0 0 }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 </head>
 <body>
 
-    <h1>FangstPlot</h1>
-    <div id="result"></div>
-    <div id="map"></div>
-    <script type="text/javascript">
-        var map = L.map('map', { preferCanvas: true }).setView([59.75, 5.25], 11);
-        L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topograatone/default/webmercator/{z}/{y}/{x}.png', {
-            attribution: '&copy; <a href="http://www.kartverket.no/">Kartverket</a>'
+<h1>FangstPlot</h1>
+<div id="result"></div>
+<div id="map"></div>
+<script type="text/javascript">
+    var map = L.map('map', { preferCanvas: true }).setView([59.75, 5.25], 11);
+    L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topograatone/default/webmercator/{z}/{y}/{x}.png', {
+        attribution: '&copy; <a href="http://www.kartverket.no/">Kartverket</a>'
+    }).addTo(map);
+
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+    var gridlag = null;
+
+    // Held på siste svar frå backend
+    var sisteCeller = [];
+    var sisteMaks = 0;
+
+    map.addControl(new L.Control.Draw({
+        edit: { featureGroup: drawnItems, edit: false, remove: false },
+        draw: {
+            polygon: true,
+            polyline: false, rectangle: false,
+            circle: false, marker: false, circlemarker: false
+        }
+    }));
+
+    // Grå -> gul -> raud. Normalisert mot beste cella i gridet.
+    function poengfarge(poeng, maks) {
+        if (!maks || !poeng || poeng <= 0) return '#e0e0e0';
+        var t = Math.min(poeng / maks, 1);
+        return 'hsl(' + (60 - 60 * t) + ', 85%, ' + (78 - 32 * t) + '%)';
+    }
+
+    function delpoengTabell(delpoeng) {
+        if (!delpoeng) return '';
+        var rader = Object.keys(delpoeng)
+            .map(k => '<tr><td>' + k + '</td><td' +
+                 (delpoeng[k] > 0 ? '' : ' style="color:#999"') + '>' +
+                 delpoeng[k] + '</td></tr>')
+            .join('');
+        return '<table class="tooltip-tabell">' + rader + '</table>';
+    }
+
+    function teiknGrid() {
+        if (gridlag) map.removeLayer(gridlag);
+        if (!sisteCeller.length) return;
+
+        gridlag = L.geoJSON({
+            type: 'FeatureCollection',
+            features: sisteCeller.map(c => ({
+                type: 'Feature',
+                geometry: c.geom,
+                properties: {
+                    i: c.i, j: c.j,
+                    djupne: c.djupne,
+                    poeng: c.poeng,
+                    delpoeng: c.delpoeng,
+                    djupnepunkt: c.punkt,
+                    grunner: c.grunner,
+                    skjer: c.tal_skjer,
+                    kurver: c.tal_kurver,
+                    fall: c.fall
+                }
+            }))
+        }, {
+            style: f => ({
+                fillColor: poengfarge(f.properties.poeng, sisteMaks),
+                fillOpacity: 0.6, color: '#333', weight: 0.3
+            }),
+            onEachFeature: (f, lag) => {
+                var p = f.properties;
+                lag.bindTooltip(
+                    '<b>Poeng: ' + (p.poeng ?? '–') + '</b>' +
+                    delpoengTabell(p.delpoeng)
+                );
+            }
         }).addTo(map);
 
-        var drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
-        var gridlag = null;
+        document.getElementById('result').innerText =
+            sisteCeller.length + ' celler (maks poeng: ' + sisteMaks + ')';
+    }
 
-        map.addControl(new L.Control.Draw({
-            edit: { featureGroup: drawnItems, edit: false, remove: false },
-            draw: {
-                polygon: true,
-                polyline: false, rectangle: false,
-                circle: false, marker: false, circlemarker: false
+    map.on('draw:created', async function (e) {
+        drawnItems.clearLayers();
+        drawnItems.addLayer(e.layer);
+        if (gridlag) map.removeLayer(gridlag);
+
+        var ring = e.layer.toGeoJSON().geometry.coordinates[0];
+        var status = document.getElementById('result');
+        status.innerText = 'Lastar varmekart…';
+
+        try {
+            var svar = await fetch('/create-grid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ coordinates: ring })
+            });
+
+            if (!svar.ok) {
+                var feil = await svar.json().catch(() => ({}));
+                throw new Error(feil.detail || ('HTTP ' + svar.status));
             }
-        }));
 
-        function farge(d) {
-            if (d == null) return '#ccc';
-            return d < 10  ? '#c6e6ff' :
-                   d < 20  ? '#7fc4f0' :
-                   d < 30  ? '#4a9fd8' :
-                   d < 50  ? '#2b7ab5' :
-                   d < 100 ? '#1a5490' : '#0d2e52';
+            var data = await svar.json();
+            sisteCeller = data.cells;
+            sisteMaks = data.maks_poeng;
+            teiknGrid();
+        } catch (err) {
+            sisteCeller = [];
+            status.innerText = 'Feil: ' + err.message;
         }
-
-        map.on('draw:created', async function (e) {
-            drawnItems.clearLayers();
-            drawnItems.addLayer(e.layer);
-            if (gridlag) map.removeLayer(gridlag);
-
-            var ring = e.layer.toGeoJSON().geometry.coordinates[0];
-            var status = document.getElementById('result');
-            status.innerText = 'Lastar varmekart…';
-
-            try {
-                var svar = await fetch('/create-grid', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ coordinates: ring })
-                });
-
-                if (!svar.ok) {
-                    var feil = await svar.json().catch(() => ({}));
-                    throw new Error(feil.detail || ('HTTP ' + svar.status));
-                }
-
-                var data = await svar.json();
-                var cells = data.cells;
-
-                gridlag = L.geoJSON({
-                    type: 'FeatureCollection',
-                    features: cells.map(c => ({
-                        type: 'Feature',
-                        geometry: c.geom,
-                        properties: {
-                            i: c.i, j: c.j,
-                            djupne: c.djupne,
-                            djupnepunkt: c.punkt,
-                            grunner: c.grunner,
-                            skjer: c.tal_skjer,
-                            kurver: c.tal_kurver,
-                            fall: c.fall
-                        }
-                    }))
-                }, {
-                    style: f => ({
-                        fillColor: farge(f.properties.djupne),
-                        fillOpacity: 0.6, color: '#333', weight: 0.3
-                    }),
-                    onEachFeature: (f, lag) => {
-                        var p = f.properties;
-                        lag.bindTooltip(
-                            'Djupne: ' + (p.djupne ?? '–') + ' m<br>' +
-                            'Djupnepunkt: ' + p.djupnepunkt.length + '<br>' +
-                            'Grunnaste: ' + (p.grunner[0] ?? '–') + ' m (' + p.grunner.length + ' grunner)<br>' +
-                            'Skjer: ' + p.skjer + '<br>' +
-                            'Kurver: ' + p.kurver + ', fall: ' + p.fall + ' m'
-                        );
-                    }
-                }).addTo(map);
-
-                status.innerText = cells.length + ' celler';
-            } catch (err) {
-                status.innerText = 'Feil: ' + err.message;
-            }
-        });
-    </script>
+    });
+</script>
 </body>
 </html>
