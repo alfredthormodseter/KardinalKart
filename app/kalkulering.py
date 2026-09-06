@@ -5,7 +5,8 @@ VEKTER = {
     "punkt": 1.5,
     "grunne": 2.5,
     "skjer": 3.0,
-    "fall": 2.0
+    "fall": 2.0,
+    "ly": 1.5,
 }
 
 DEPTH_BEST = (5.0, 20)
@@ -43,7 +44,7 @@ PUNKT_VEKT = {
     Dybdetype.KAIPUNKT: 0.0,
 }
 
-DELPOENG_NOKLAR = {"djupne", "grunne", "punkt", "skjer", "fall"}
+DELPOENG_NOKLAR = {"djupne", "grunne", "punkt", "skjer", "fall", "ly"}
 assert DELPOENG_NOKLAR == VEKTER.keys(), (
     f"Mismatch: {DELPOENG_NOKLAR ^ VEKTER.keys()}"
 )
@@ -85,6 +86,12 @@ def steep_score(fall: float, tal_kurver: int) -> float:
         return 0.0
     return min(1.0, float(fall) / 15.0)
 
+def ly_score(landdel_nv: float | None) -> float:
+    """Del av NV-korridoren som er land/holme. Meir land = meir ly."""
+    if landdel_nv is None:
+        return 0.0
+    return min(1.0, float(landdel_nv) * 1.5)
+
 def celle_score(celle: dict) -> dict:
     delpoeng = {
         "djupne": depth_score(celle.get("djupne")),
@@ -92,6 +99,7 @@ def celle_score(celle: dict) -> dict:
         "punkt": punkt_score(celle.get("punkt") or []),
         "skjer": skjer_score(celle.get("tal_skjer") or 0),
         "fall": steep_score(celle.get("fall") or 0, celle.get("tal_kurver") or 0),
+        "ly": ly_score(celle.get("landdel_nv")),
     }
     total = sum(delpoeng[k] * VEKTER.get(k, 0.0) for k in delpoeng)
     return {

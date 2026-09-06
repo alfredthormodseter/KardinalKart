@@ -93,8 +93,6 @@
             }
         }).addTo(map);
 
-        document.getElementById('result').innerText =
-            sisteCeller.length + ' celler (maks poeng: ' + sisteMaks + ')';
     }
 
     map.on('draw:created', async function (e) {
@@ -122,6 +120,7 @@
             sisteCeller = data.cells;
             sisteMaks = data.maks_poeng;
             teiknGrid();
+            status.innerText = '';
         } catch (err) {
             sisteCeller = [];
             status.innerText = 'Feil: ' + err.message;

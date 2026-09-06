@@ -4,6 +4,7 @@ from app.db import engine
 
 MAKS_CELLER = 10_000 #Ca.
 CELLESTORLEIK = 30.0
+LY_LENGD = 250.0    # kor langt NV vi ser etter ly
 
 ESTIMAT = text("""
     SELECT ST_Area(ST_Transform(ST_MakeValid(ST_GeomFromText(:wkt, 4326)), 25832))
@@ -47,7 +48,22 @@ SQL = text("""
                     SELECT c.i, c.j, count(DISTINCT d.dybde) AS tal_kurver, max(d.dybde) - min(d.dybde) AS fall
                     FROM celler c
                         JOIN dybde.dybdekurve d ON ST_Intersects(c.geom, d.grense)
-                    GROUP BY c.i, c.j)
+                    GROUP BY c.i, c.j),
+                --Prøvepunkt NV for kvar celle. Punkt utan dybdeareal = land/holme.
+                ly_punkt AS (
+                    SELECT c.i, c.j, s.n,
+                           ST_Translate(
+                                   ST_Centroid(c.geom),
+                                   -:ly_lengd * 0.7071 * s.n / 5.0,
+                                   :ly_lengd * 0.7071 * s.n / 5.0
+                           ) AS pkt
+                    FROM celler c, generate_series(1, 5) AS s(n)),
+                ly AS (
+                    SELECT p.i, p.j,
+                           avg(CASE WHEN a.omrade IS NULL THEN 1.0 ELSE 0.0 END) AS landdel
+                    FROM ly_punkt p
+                             LEFT JOIN dybde.dybdeareal a ON ST_Intersects(a.omrade, p.pkt)
+                    GROUP BY p.i, p.j)
            SELECT c.i,
                   c.j,
                   round(o.snitt::numeric, 1)                  AS djupne,
@@ -56,6 +72,7 @@ SQL = text("""
                   coalesce(s.tal_skjer, 0)                    AS tal_skjer,
                   coalesce(f.tal_kurver, 0)                   AS tal_kurver,
                   coalesce(f.fall, 0)                         AS fall,
+                  round(coalesce(l.landdel, 0)::numeric, 3) AS landdel_nv,
                   ST_AsGeoJSON(ST_Transform(c.geom, 4326), 6) AS geom
            FROM celler c
                     LEFT JOIN omradedybde o USING (i, j)
@@ -63,6 +80,7 @@ SQL = text("""
                     LEFT JOIN grunner g USING (i, j)
                     LEFT JOIN skjer s USING (i, j)
                     LEFT JOIN fall f USING (i, j)
+                    LEFT JOIN ly l USING (i, j)
            """)
 
 
@@ -83,7 +101,11 @@ def hent_celler(coords: list[tuple[float, float]]) -> list[dict]:
                 f"Omrisset gir ca. {int(n)} celler. Maks er {MAKS_CELLER}. "
                 f"Marker eit mindre område."
             )
-        rows = conn.execute(SQL, {"wkt": wkt, "size": CELLESTORLEIK}).fetchall()
+        rows = conn.execute(SQL, {
+            "wkt": wkt,
+            "size": CELLESTORLEIK,
+            "ly_lengd": LY_LENGD,
+        }).fetchall()
 
     return [
         {"i": r.i, "j": r.j,
@@ -93,6 +115,7 @@ def hent_celler(coords: list[tuple[float, float]]) -> list[dict]:
          "tal_skjer": r.tal_skjer,
          "tal_kurver": r.tal_kurver,
          "fall": _f(r.fall),
+         "landdel_nv": _f(r.landdel_nv),
          "geom": json.loads(r.geom)}
         for r in rows
     ]
