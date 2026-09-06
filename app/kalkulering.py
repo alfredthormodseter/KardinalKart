@@ -2,16 +2,17 @@ from enum import IntEnum
 
 VEKTER = {
     "djupne": 2.0,
-    "punkt": 1.5,
+    "punkt": 1.0,
     "grunne": 2.5,
     "skjer": 3.0,
-    "fall": 2.0,
-    "ly": 1.5,
+    "fall": 1.5,
+    "ly": 3.0,
 }
 
+MIN_DEPTH = 2.0
 DEPTH_BEST = (5.0, 20)
-DEPTH_BETTER = (5.0, 35)
-DEPTH_GOOD = (5.0, 50)
+DEPTH_BETTER = (20, 35)
+DEPTH_GOOD = (35, 50)
 
 DEPTH_BANDS = [
     (DEPTH_BEST, 1.0),
@@ -93,6 +94,15 @@ def ly_score(landdel_nv: float | None) -> float:
     return min(1.0, float(landdel_nv) * 1.5)
 
 def celle_score(celle: dict) -> dict:
+    djupne = celle.get("djupne")
+    # Land eller fjøresone - ingen poeng uansett andre signal
+    if djupne is None or abs(float(djupne)) < MIN_DEPTH:
+        return {
+            **celle,
+            "poeng": 0.0,
+            "delpoeng": {k: 0.0 for k in DELPOENG_NOKLAR},
+        }
+
     delpoeng = {
         "djupne": depth_score(celle.get("djupne")),
         "grunne": grunne_score(celle.get("grunner") or []),

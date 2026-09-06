@@ -1,0 +1,19 @@
+#map { height: 800px; width: 800px; }
+
+#kontrollar {
+    margin: 0 0 8px;
+    font: 13px sans-serif;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+#kontrollar label { display: flex; gap: 4px; align-items: center; }
+
+.tooltip-tabell { font-size: 11px; border-collapse: collapse; }
+.tooltip-tabell td { padding: 0 4px 0 0; }
+.leaflet-interactive:focus { outline: none; }
+.delpoeng-tabell { font-size: 12px; border-collapse: collapse; margin-top: 4px; }
+.delpoeng-tabell td { padding: 1px 8px 1px 0; }
+.delpoeng-tabell td:last-child { text-align: right; }
+.celle-meta { font-size: 11px; color: #666; margin-top: 4px; }
