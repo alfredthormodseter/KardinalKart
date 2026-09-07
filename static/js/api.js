@@ -5,14 +5,18 @@ function settStatus(tekst) {
     if (el) el.innerText = tekst;
 }
 
-map.on('draw:created', async function (e) {
+// Teiknar omrisset utan å utløyse draw:created.
+function visOmriss(ring) {
     drawnItems.clearLayers();
-    drawnItems.addLayer(e.layer);
+    var latlngs = ring.map(function (p) { return [p[1], p[0]]; });
+    drawnItems.addLayer(L.polygon(latlngs, {
+        color: '#000', weight: 1, fill: false, fillOpacity: 0
+    }));
+}
 
-    var ring = e.layer.toGeoJSON().geometry.coordinates[0];
-    var status = document.getElementById('result');
-    status.innerText = 'Lastar varmekart…';
-
+// Felles veg for både nyteikna og gjenoppretta område.
+async function lastGrid(ring) {
+    settStatus('Lastar varmekart…');
     try {
         var svar = await fetch('/create-grid', {
             method: 'POST',
@@ -29,9 +33,40 @@ map.on('draw:created', async function (e) {
         sisteCeller = data.cells;
         sisteMaks = data.maks_poeng;
         teiknGrid();
-        status.innerText = '';
+        settStatus('');
     } catch (err) {
         sisteCeller = [];
-        status.innerText = 'Feil: ' + err.message;
+        settStatus('Feil: ' + err.message);
     }
+}
+
+map.on('draw:created', async function (e) {
+    drawnItems.clearLayers();
+    drawnItems.addLayer(e.layer);
+
+    var ring = e.layer.toGeoJSON().geometry.coordinates[0];
+    await lastGrid(ring);
+
+    // Lagringa er sekundær: feilar ho, står kartet likevel.
+    fetch('/omraade', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coordinates: ring })
+    }).catch(function (err) {
+        console.warn('Klarte ikkje lagre området:', err);
+    });
 });
+
+// Ved oppstart: hent sist markerte område og rekn gridet på nytt.
+(function gjenopprett() {
+    fetch('/omraade')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+            if (!data || !Array.isArray(data.coordinates)) return;
+            visOmriss(data.coordinates);
+            lastGrid(data.coordinates);
+        })
+        .catch(function (err) {
+            console.warn('Klarte ikkje hente lagra område:', err);
+        });
+})();

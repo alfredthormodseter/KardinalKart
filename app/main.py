@@ -4,8 +4,15 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from app.grid import hent_celler
 from app.kalkulering import score_celler
+from app.omraade import lag_tabell, hent_omraade, lagre_omraade
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    lag_tabell()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 #Sjekkar om create_grid kan bli kalla
 class PolygonRequest(BaseModel):
@@ -14,6 +21,15 @@ class PolygonRequest(BaseModel):
 @app.get("/")
 async def read_root():
     return FileResponse("static/index.html")
+
+@app.get("/omraade")
+def get_omraade():
+    return {"coordinates": hent_omraade()}
+
+@app.put("/omraade")
+def put_omraade(req: PolygonRequest):
+    lagre_omraade(req.coordinates)
+    return {"ok": True}
 
 @app.get("/catches")
 def get_catches():
