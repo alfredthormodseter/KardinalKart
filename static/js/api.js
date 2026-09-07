@@ -1,5 +1,10 @@
 // Kommunikasjon med backend.
 
+function settStatus(tekst) {
+    const el = document.getElementById('result');
+    if (el) el.innerText = tekst;
+}
+
 map.on('draw:created', async function (e) {
     drawnItems.clearLayers();
     drawnItems.addLayer(e.layer);

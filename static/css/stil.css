@@ -1,7 +1,29 @@
-#map { height: 800px; width: 800px; }
+
+html, body { height: 100%; margin: 0; }
+#kart-ramme { position: relative; height: 100vh; }
+#map { height: 100%; width:100%; }
+#overskrift {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;   /* slepp klikk gjennom til kartet */
+  background: rgba(255,255,255,0.85);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin: 0;
+}
 
 #kontrollar {
-    margin: 0 0 8px;
+    position: absolute;
+    top: 4rem;
+    left: 1rem;
+    z-index: 1000;
+    background: rgba(255,255,255,0.9);
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin: 0;
     font: 13px sans-serif;
     display: flex;
     gap: 16px;
