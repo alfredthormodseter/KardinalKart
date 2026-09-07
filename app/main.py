@@ -6,6 +6,7 @@ from app.grid import hent_celler
 from app.kalkulering import score_celler
 from app.omraade import lag_tabell, hent_omraade, lagre_omraade
 from contextlib import asynccontextmanager
+from app.trekk import lag_tabell as lag_trekk_tabell, lagre_trekk
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,6 +18,20 @@ app = FastAPI(lifespan=lifespan)
 #Sjekkar om create_grid kan bli kalla
 class PolygonRequest(BaseModel):
     coordinates: list[tuple[float, float]] = Field(min_length=4)
+
+class TrekkRequest(BaseModel):
+    lat: float
+    lng: float
+    staatid_dagar: int = Field(ge=1, le=5)
+    total_antall: int = Field(ge=0)
+    undermaals_antall: int = Field(ge=0)
+    djupne: float | None = None
+
+@app.post("/trekk")
+def post_trekk(req: TrekkRequest):
+    if req.undermaals_antall > req.total_antall:
+        raise HTTPException(400, "Undermåls kan ikkje vere fleire enn totalt.")
+    return {"trekk_id": lagre_trekk(**req.model_dump())}
 
 @app.get("/")
 async def read_root():
@@ -34,6 +49,12 @@ def put_omraade(req: PolygonRequest):
 @app.get("/catches")
 def get_catches():
     return {"catches": []}
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    lag_tabell()
+    lag_trekk_tabell()
+    yield
 
 #Brukar hent_celler til å lage eit grid
 @app.post("/create-grid")
