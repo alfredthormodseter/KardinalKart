@@ -97,10 +97,10 @@ def hent_celler(coords: list[tuple[float, float]]) -> list[dict]:
     with engine.connect() as conn:
         n = conn.execute(ESTIMAT, {"wkt": wkt, "size": CELLESTORLEIK}).scalar()
         if n > MAKS_CELLER:
-            raise ValueError(
-                f"Omrisset gir ca. {int(n)} celler. Maks er {MAKS_CELLER}. "
-                f"Marker eit mindre område."
-            )
+            print(f"Omrisset gir ca. {int(n)} celler. Maks er {MAKS_CELLER}. ")
+            print(f"Marker eit mindre område.")
+        else:
+            print(int(n))
         rows = conn.execute(SQL, {
             "wkt": wkt,
             "size": CELLESTORLEIK,

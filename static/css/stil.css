@@ -15,23 +15,6 @@ html, body { height: 100%; margin: 0; }
   margin: 0;
 }
 
-#kontrollar {
-    position: absolute;
-    top: 4rem;
-    left: 1rem;
-    z-index: 1000;
-    background: rgba(255,255,255,0.9);
-    padding: 6px 10px;
-    border-radius: 4px;
-    margin: 0;
-    font: 13px sans-serif;
-    display: flex;
-    gap: 16px;
-    align-items: center;
-}
-
-#kontrollar label { display: flex; gap: 4px; align-items: center; }
-
 .tooltip-tabell { font-size: 11px; border-collapse: collapse; }
 .tooltip-tabell td { padding: 0 4px 0 0; }
 .leaflet-interactive:focus { outline: none; }

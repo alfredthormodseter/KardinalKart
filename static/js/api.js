@@ -1,10 +1,5 @@
 // Kommunikasjon med backend.
 
-function settStatus(tekst) {
-    const el = document.getElementById('result');
-    if (el) el.innerText = tekst;
-}
-
 // Teiknar omrisset utan å utløyse draw:created.
 function visOmriss(ring) {
     drawnItems.clearLayers();
@@ -16,7 +11,6 @@ function visOmriss(ring) {
 
 // Felles veg for både nyteikna og gjenoppretta område.
 async function lastGrid(ring) {
-    settStatus('Lastar varmekart…');
     try {
         var svar = await fetch('/create-grid', {
             method: 'POST',
@@ -33,10 +27,8 @@ async function lastGrid(ring) {
         sisteCeller = data.cells;
         sisteMaks = data.maks_poeng;
         teiknGrid();
-        settStatus('');
     } catch (err) {
         sisteCeller = [];
-        settStatus('Feil: ' + err.message);
     }
 }
 
