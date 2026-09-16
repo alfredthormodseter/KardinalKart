@@ -1,9 +1,7 @@
-// Varmekart-rendering + usynleg hex-lag for tooltips.
+// Varmekart-rendering
 
 var KANTLENGD_M = 30;
 
-// Blob-radius i høve til avstanden mellom cellesentra.
-// Under 1.0 gjev synlege enkeltprikkar, over 2.0 blir alt éin klump.
 var RADIUSFAKTOR = 1.4;
 
 var varmelag = null;
@@ -35,7 +33,6 @@ function varmeradius() {
     return Math.max(6, senteravstandPx * RADIUSFAKTOR);
 }
 
-// Snittet av hjørna. Godt nok for ein regulær hexagon.
 function sentroide(geom) {
     var ring = geom.coordinates[0];
     var n = ring.length - 1;  // siste punkt = første
@@ -69,8 +66,15 @@ function teiknGrid() {
     }).addTo(map);
 }
 
-// Radius er i pikslar, ikkje meter. Utan dette dekkjer blobbane eit
-// stadig større geografisk område etter kvart som du zoomar ut.
+const result = await fetch('/api/calculate', {
+    method: 'POST',
+    body: JSON.stringify({wkt, size: CELLESTORLEIK})
+}).then(r => r.json());
+
+const status = document.getElementById('Status');
+status.textContent = result.status;
+status.style.transform = 'translateX(0)';
+
 map.on('zoomend', function () {
     if (!varmelag) return;
     var r = varmeradius();
@@ -105,7 +109,6 @@ map.on('click', function (e) {
         if (d < minDist) { minDist = d; best = c; }
     });
 
-    // Halv cellebreidd + margin. Utanfor gridet skjer ingenting.
     if (!best || minDist > KANTLENGD_M * 1.5) return;
 
     popup

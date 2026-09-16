@@ -8,7 +8,20 @@ html, body { height: 100%; margin: 0; }
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
-  pointer-events: none;   /* slepp klikk gjennom til kartet */
+  pointer-events: none;
+  background: rgba(255,255,255,0.85);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin: 0;
+}
+
+#Status {
+  position: absolute;
+  top: 1rem;
+  left: 10%;
+  transform: translateX(-80%);
+  z-index: 1000;
+  pointer-events: none;
   background: rgba(255,255,255,0.85);
   padding: 0.5rem 1rem;
   border-radius: 4px;

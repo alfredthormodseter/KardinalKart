@@ -88,7 +88,7 @@ def _f(v):
     return float(v) if v is not None else None
 
 
-def hent_celler(coords: list[tuple[float, float]]) -> list[dict]:
+def hent_celler(coords: list[tuple[float, float]]) -> list[dict] | dict:
     """coords er [(lng, lat), ...], lukka ring."""
     if coords[0] != coords[-1]:
         coords = list(coords) + [coords[0]]
@@ -97,10 +97,11 @@ def hent_celler(coords: list[tuple[float, float]]) -> list[dict]:
     with engine.connect() as conn:
         n = conn.execute(ESTIMAT, {"wkt": wkt, "size": CELLESTORLEIK}).scalar()
         if n > MAKS_CELLER:
+            status_msg = f"Omrisset gir ca. {int(n)} celler. Maks er {MAKS_CELLER}. "
             print(f"Omrisset gir ca. {int(n)} celler. Maks er {MAKS_CELLER}. ")
-            print(f"Marker eit mindre område.")
-        else:
-            print(int(n))
+            return {"error": status_msg}  # Returner error signal
+
+        print(f"Lastar varmekart med {int(n)} celler...")
         rows = conn.execute(SQL, {
             "wkt": wkt,
             "size": CELLESTORLEIK,

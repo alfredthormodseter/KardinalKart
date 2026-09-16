@@ -56,17 +56,21 @@ async def lifespan(app: FastAPI):
     lag_trekk_tabell()
     yield
 
-#Brukar hent_celler til å lage eit grid
 @app.post("/create-grid")
 def create_grid(req: PolygonRequest):
     try:
-        celler = score_celler(hent_celler(req.coordinates))
+        celler = hent_celler(req.coordinates)
+        if isinstance(celler, dict) and "error" in celler:
+            return {"status": celler["error"]}
+
+        celler = score_celler(celler)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
     return {
         "cells": celler,
         "maks_poeng": max((c["poeng"] for c in celler), default=0.0),
+        "status": f"Lastar varmekart med {len(celler)} celler..."
     }
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
