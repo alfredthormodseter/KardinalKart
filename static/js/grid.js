@@ -41,6 +41,30 @@ function sentroide(geom) {
     return [y / n, x / n];    // [lat, lng]
 }
 
+function getCoordinates() {
+    var polygon = null;
+    drawnItems.eachLayer(function(layer) {
+        if (layer instanceof L.Polygon) {
+            polygon = layer;
+        }
+    });
+
+    if (!polygon) {
+        alert('Teikn eit område først');
+        return null;
+    }
+
+    var latlngs = polygon.getLatLngs()[0];
+    var coordinates = latlngs.map(latlng => [latlng.lng, latlng.lat]);
+
+    // Lukk ringen viss det ikkje er lukka
+    if (coordinates[0] !== coordinates[coordinates.length - 1]) {
+        coordinates.push(coordinates[0]);
+    }
+
+    return coordinates;
+}
+
 function varmepunkt() {
     return sisteCeller
         .filter(function (c) { return c.poeng > 0; })
@@ -65,15 +89,6 @@ function teiknGrid() {
         gradient: GRADIENT
     }).addTo(map);
 }
-
-const result = await fetch('/api/calculate', {
-    method: 'POST',
-    body: JSON.stringify({wkt, size: CELLESTORLEIK})
-}).then(r => r.json());
-
-const status = document.getElementById('Status');
-status.textContent = result.status;
-status.style.transform = 'translateX(0)';
 
 map.on('zoomend', function () {
     if (!varmelag) return;
