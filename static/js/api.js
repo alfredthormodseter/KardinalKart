@@ -1,6 +1,6 @@
 // Kommunikasjon med backend.
 
-//Teiknar det lagra polygonet, men held det interaktivt for å ikkje forstyrre teikninga av nye.
+//Teiknar det lagra polygonet
 function visOmriss(ring) {
     drawnItems.clearLayers();
 
@@ -13,12 +13,13 @@ function visOmriss(ring) {
         weight: 1,
         fill: false,
         fillOpacity: 0,
-        interactive: false
+        interactive: false // For at layer ikkje skal hindra teikning av nye områder
     }));
 }
 
-// Felles veg for både nyteikna og gjenoppretta område.
 async function lastGrid(ring) {
+    setStatus('Lastar varmekart...', 'loading');
+
     try {
         var svar = await fetch('/create-grid', {
             method: 'POST',
@@ -26,17 +27,39 @@ async function lastGrid(ring) {
             body: JSON.stringify({ coordinates: ring })
         });
 
+        var data = await svar.json();
+
         if (!svar.ok) {
-            var feil = await svar.json().catch(() => ({}));
-            throw new Error(feil.detail || ('HTTP ' + svar.status));
+            throw new Error(data.detail || ('HTTP ' + svar.status));
         }
 
-        var data = await svar.json();
-        sisteCeller = data.cells;
-        sisteMaks = data.maks_poeng;
+        setStatus(data.status || 'Varmekartet er lasta.', 'success');
+
+        // Ved for stort område kjem det status, men ikkje celler.
+        if (data.status && !data.cells) {
+            sisteCeller = [];
+            sisteMaks = 0;
+            if (varmelag) {
+                map.removeLayer(varmelag);
+                varmelag = null;
+            }
+            return;
+        }
+
+        sisteCeller = data.cells || [];
+        sisteMaks = data.maks_poeng || 0;
         teiknGrid();
+
     } catch (err) {
         sisteCeller = [];
+        sisteMaks = 0;
+
+        if (varmelag) {
+            map.removeLayer(varmelag);
+            varmelag = null;
+        }
+
+        setStatus('Klarte ikkje laste varmekartet: ' + err.message, 'error');
     }
 }
 
@@ -70,3 +93,10 @@ map.on('draw:created', async function (e) {
             console.warn('Klarte ikkje hente lagra område:', err);
         });
 })();
+
+function setStatus(message, type) {
+    var status = document.getElementById('Status');
+
+    status.textContent = message || '';
+    status.className = type || '';
+}
