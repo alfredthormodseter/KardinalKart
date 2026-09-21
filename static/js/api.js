@@ -18,49 +18,36 @@ function visOmriss(ring) {
 }
 
 async function lastGrid(ring) {
-    setStatus('Lastar varmekart...', 'loading');
+  publishStatus('Lastar varmekart...', 'loading')
 
-    try {
-        var svar = await fetch('/create-grid', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ coordinates: ring })
-        });
+  try {
+    var svar = await fetch('/create-grid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ coordinates: ring })
+    })
 
-        var data = await svar.json();
+    var data = await svar.json()
 
-        if (!svar.ok) {
-            throw new Error(data.detail || ('HTTP ' + svar.status));
-        }
-
-        setStatus(data.status || 'Varmekartet er lasta.', 'success');
-
-        // Ved for stort område kjem det status, men ikkje celler.
-        if (data.status && !data.cells) {
-            sisteCeller = [];
-            sisteMaks = 0;
-            if (varmelag) {
-                map.removeLayer(varmelag);
-                varmelag = null;
-            }
-            return;
-        }
-
-        sisteCeller = data.cells || [];
-        sisteMaks = data.maks_poeng || 0;
-        teiknGrid();
-
-    } catch (err) {
-        sisteCeller = [];
-        sisteMaks = 0;
-
-        if (varmelag) {
-            map.removeLayer(varmelag);
-            varmelag = null;
-        }
-
-        setStatus('Klarte ikkje laste varmekartet: ' + err.message, 'error');
+    if (!svar.ok) {
+      throw new Error(data.detail || ('HTTP ' + svar.status))
     }
+
+    if (data.error) {
+      publishStatus(data.status, 'error')
+      return
+    }
+
+    publishStatus(data.status, 'success')
+
+    sisteCeller = data.cells || []
+    sisteMaks = data.maks_poeng || 0
+    teiknGrid()
+  } catch (err) {
+    publishStatus('Klarte ikkje laste varmekartet: ' + err.message, 'error')
+    sisteCeller = []
+    sisteMaks = 0
+  }
 }
 
 map.on('draw:created', async function (e) {
@@ -99,4 +86,10 @@ function setStatus(message, type) {
 
     status.textContent = message || '';
     status.className = type || '';
+}
+
+function publishStatus(message, type = '') {
+  window.dispatchEvent(new CustomEvent('status-update', {
+    detail: { message, type }
+  }))
 }

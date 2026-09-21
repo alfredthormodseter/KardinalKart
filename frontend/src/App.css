@@ -1,8 +1,21 @@
 #Status {
-  position: fixed;
+  position: absolute;
   left: 16px;
   bottom: 16px;
+  z-index: 2000;
+  pointer-events: none;
   background: rgba(255, 255, 255, 0.85);
   padding: 0.5rem 1rem;
   border-radius: 4px;
+  margin: 0;
+}
+
+#Status.success {
+  color: #0a6f2c;
+  font-weight: 600;
+}
+
+#Status.error {
+  color: #9d1f1f;
+  font-weight: 700;
 }

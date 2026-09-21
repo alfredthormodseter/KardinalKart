@@ -1,12 +1,29 @@
+import { useEffect, useState } from 'react'
 import StatusMessage from './components/StatusMessage'
-import './App.css'
 
 function App() {
+  const [status, setStatus] = useState({
+    message: '',
+    type: '',
+  })
+
+  useEffect(() => {
+    function handleStatus(event) {
+      setStatus(event.detail)
+    }
+
+    window.addEventListener('status-update', handleStatus)
+
+    return () => {
+      window.removeEventListener('status-update', handleStatus)
+    }
+  }, [])
+
   return (
-    <>
-      <h1>FangstPlot</h1>
-      <StatusMessage message="React fungerer" />
-    </>
+    <StatusMessage
+      message={status.message}
+      type={status.type}
+    />
   )
 }
 

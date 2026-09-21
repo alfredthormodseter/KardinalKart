@@ -1,5 +1,9 @@
-function StatusMessage({ message }) {
-  return <div id="Status">{message}</div>
+function StatusMessage({ message, type = '' }) {
+  return (
+    <div id="Status" className={type}>
+      {message}
+    </div>
+  )
 }
 
 export default StatusMessage
