@@ -1,11 +1,19 @@
 // Kommunikasjon med backend.
 
-// Teiknar omrisset utan å utløyse draw:created.
+//Teiknar det lagra polygonet, men held det interaktivt for å ikkje forstyrre teikninga av nye.
 function visOmriss(ring) {
     drawnItems.clearLayers();
-    var latlngs = ring.map(function (p) { return [p[1], p[0]]; });
+
+    var latlngs = ring.map(function (p) {
+        return [p[1], p[0]];
+    });
+
     drawnItems.addLayer(L.polygon(latlngs, {
-        color: '#000', weight: 1, fill: false, fillOpacity: 0
+        color: '#000',
+        weight: 1,
+        fill: false,
+        fillOpacity: 0,
+        interactive: false
     }));
 }
 
