@@ -11,11 +11,11 @@ from app.trekk import lag_tabell as lag_trekk_tabell, lagre_trekk
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     lag_tabell()
+    lag_trekk_tabell()
     yield
 
 app = FastAPI(lifespan=lifespan)
 
-#Sjekkar om create_grid kan bli kalla
 class PolygonRequest(BaseModel):
     coordinates: list[tuple[float, float]] = Field(min_length=4)
 
@@ -49,12 +49,6 @@ def put_omraade(req: PolygonRequest):
 @app.get("/catches")
 def get_catches():
     return {"catches": []}
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    lag_tabell()
-    lag_trekk_tabell()
-    yield
 
 @app.post("/create-grid")
 def create_grid(req: PolygonRequest):
