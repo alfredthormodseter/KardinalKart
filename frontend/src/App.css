@@ -1,0 +1,8 @@
+#Status {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
