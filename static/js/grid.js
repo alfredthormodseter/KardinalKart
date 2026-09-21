@@ -57,9 +57,12 @@ function getCoordinates() {
     var latlngs = polygon.getLatLngs()[0];
     var coordinates = latlngs.map(latlng => [latlng.lng, latlng.lat]);
 
-    // Lukk ringen viss det ikkje er lukka
-    if (coordinates[0] !== coordinates[coordinates.length - 1]) {
-        coordinates.push(coordinates[0]);
+    // Lukk ringen om den ikkje er lukka
+    var first = coordinates[0];
+    var last = coordinates[coordinates.length - 1];
+
+    if (first[0] !== last[0] || first[1] !== last[1]) {
+        coordinates.push(first);
     }
 
     return coordinates;

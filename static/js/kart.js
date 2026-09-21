@@ -24,11 +24,3 @@ map.addControl(new L.Control.Draw({
         circle: false, marker: false, circlemarker: false
     }
 }));
-
-map.on('draw:created', function(e) {
-    calculateGrid();
-});
-
-map.on('draw:edited', function(e) {
-    calculateGrid();
-});
