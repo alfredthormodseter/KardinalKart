@@ -81,15 +81,12 @@ map.on('draw:created', async function (e) {
         });
 })();
 
-function setStatus(message, type) {
-    var status = document.getElementById('Status');
-
-    status.textContent = message || '';
-    status.className = type || '';
-}
-
 function publishStatus(message, type = '') {
+  const status = { message, type };
+
+  window.__fangstPlotStatus = status;
+
   window.dispatchEvent(new CustomEvent('status-update', {
-    detail: { message, type }
-  }))
+    detail: status
+  }));
 }

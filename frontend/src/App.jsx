@@ -14,6 +14,10 @@ function App() {
 
     window.addEventListener('status-update', handleStatus)
 
+    if (window.__fangstPlotStatus) {
+      setStatus(window.__fangstPlotStatus)
+    }
+
     return () => {
       window.removeEventListener('status-update', handleStatus)
     }
