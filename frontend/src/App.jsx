@@ -3,7 +3,6 @@ import StatusMessage from './components/StatusMessage'
 import Title from './components/Title'
 
 function App() {
-  return <Title>FangstPlot</Title>
   const [status, setStatus] = useState({
     message: '',
     type: '',
@@ -26,10 +25,13 @@ function App() {
   }, [])
 
   return (
+      <>
+      <Title>FangstPlot</Title>
     <StatusMessage
       message={status.message}
       type={status.type}
     />
+    </>
   )
 }
 
