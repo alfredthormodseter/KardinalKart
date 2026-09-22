@@ -79,7 +79,11 @@ function varmepunkt() {
 }
 
 function teiknGrid() {
-    if (varmelag) map.removeLayer(varmelag);
+    if (varmelag) {
+        map.removeLayer(varmelag);
+        varmelag = null;
+    }
+
     if (!sisteCeller.length) return;
 
     varmelag = L.heatLayer(varmepunkt(), {
@@ -94,12 +98,19 @@ function teiknGrid() {
 }
 
 map.on('zoomend', function () {
-    if (!varmelag) return;
+    if (!varmelag || !map.hasLayer(varmelag)) return;
+
     var r = varmeradius();
-    varmelag.setOptions({
-        radius: r,
-        blur: r * 0.9,
-        maxZoom: map.getZoom()
+
+    // Vent til Leaflet er ferdig med zoom-renderinga.
+    requestAnimationFrame(function () {
+        if (!varmelag || !map.hasLayer(varmelag)) return;
+
+        varmelag.setOptions({
+            radius: r,
+            blur: r * 0.9,
+            maxZoom: map.getZoom()
+        });
     });
 });
 
