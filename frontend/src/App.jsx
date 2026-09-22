@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import StatusMessage from './components/StatusMessage'
 import Title from './components/Title'
+import TrekkSheet from './components/TrekkSheet'
 
 function App() {
   const [status, setStatus] = useState({
@@ -26,12 +27,15 @@ function App() {
 
   return (
       <>
-      <Title>FangstPlot</Title>
-    <StatusMessage
-      message={status.message}
-      type={status.type}
-    />
-    </>
+          <Title>FangstPlot</Title>
+
+          <StatusMessage
+              message={status.message}
+              type={status.type}
+          />
+
+          <TrekkSheet />
+      </>
   )
 }
 

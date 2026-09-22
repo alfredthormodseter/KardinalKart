@@ -1,10 +1,15 @@
-// Registrering av teinetrekk. Høgreklikk på kartet opnar panelet.
-
-var trekkPanel = document.getElementById('trekk-panel');
 var trekkPosisjon = null;
 var trekkMarkor = null;
 
-// Sesjonsminne: neste registrering arvar ståtida frå den førre.
+window.addEventListener('trekk-sheet-closed', function () {
+    if (trekkMarkor) {
+        map.removeLayer(trekkMarkor);
+        trekkMarkor = null;
+    }
+
+    trekkPosisjon = null;
+});
+
 var sisteStaatid = '1';
 
 function opnaTrekkPanel(latlng) {
@@ -33,53 +38,23 @@ function lukkTrekkPanel() {
 }
 
 map.on('contextmenu', function (e) {
-    opnaTrekkPanel(e.latlng);
-});
+  trekkPosisjon = e.latlng
 
-document.getElementById('trekk-avbryt')
-        .addEventListener('click', lukkTrekkPanel);
+  if (trekkMarkor) map.removeLayer(trekkMarkor)
 
-document.getElementById('trekk-lagre')
-        .addEventListener('click', async function () {
-    if (!trekkPosisjon) return;
+  trekkMarkor = L.marker(e.latlng).addTo(map)
 
-    var staatid = document.getElementById('trekk-staatid').value;
-    var djupne = document.getElementById('trekk-djupne').value;
-    var total = parseInt(document.getElementById('trekk-total').value, 10);
-    var undermaals = parseInt(document.getElementById('trekk-undermaals').value, 10);
-    var feil = document.getElementById('trekk-feil');
+  window.dispatchEvent(new CustomEvent('trekk-selected', {
+    detail: {
+      lat: e.latlng.lat,
+      lng: e.latlng.lng,
+    },
+  }))
 
-    if (isNaN(total) || isNaN(undermaals)) {
-        feil.innerText = 'Fyll inn tal.';
-        return;
+  window.addEventListener('trekk-sheet-closed', function () {
+    if (trekkMarkor) {
+      map.removeLayer(trekkMarkor)
+      trekkMarkor = null
     }
-    if (undermaals > total) {
-        feil.innerText = 'Undermåls kan ikkje vere fleire enn totalt.';
-        return;
-    }
-
-    try {
-        var svar = await fetch('/trekk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                lat: trekkPosisjon.lat,
-                lng: trekkPosisjon.lng,
-                staatid_dagar: parseInt(staatid, 10),
-                total_antall: total,
-                undermaals_antall: undermaals,
-                djupne: djupne === '' ? null : parseFloat(djupne)
-            })
-        });
-
-        if (!svar.ok) {
-            var d = await svar.json().catch(() => ({}));
-            throw new Error(d.detail || ('HTTP ' + svar.status));
-        }
-
-        sisteStaatid = staatid;
-        lukkTrekkPanel();
-    } catch (err) {
-        feil.innerText = 'Feil: ' + err.message;
-    }
-});
+  })
+})
