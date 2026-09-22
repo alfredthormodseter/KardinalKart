@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import StatusMessage from './components/StatusMessage'
+import Title from './components/Title'
 
 function App() {
+  return <Title>FangstPlot</Title>
   const [status, setStatus] = useState({
     message: '',
     type: '',
