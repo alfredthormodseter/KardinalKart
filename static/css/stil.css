@@ -10,30 +10,3 @@ html, body { height: 100%; margin: 0; }
 .delpoeng-tabell td { padding: 1px 8px 1px 0; }
 .delpoeng-tabell td:last-child { text-align: right; }
 .celle-meta { font-size: 11px; color: #666; margin-top: 4px; }
-
-#trekk-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1100;
-    width: 260px;
-    height: 100%;
-    box-sizing: border-box;
-    background: rgba(255,255,255,0.97);
-    box-shadow: -2px 0 8px rgba(0,0,0,0.2);
-    padding: 16px;
-    font: 13px sans-serif;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    overflow-y: auto;
-}
-
-#trekk-panel[hidden] { display: none; }
-#trekk-panel h2 { margin: 0; font-size: 15px; }
-#trekk-panel label { display: flex; flex-direction: column; gap: 3px; }
-#trekk-panel input, #trekk-panel select { padding: 4px; font: inherit; }
-#trekk-posisjon { font-size: 11px; color: #666; }
-#trekk-knappar { display: flex; gap: 8px; margin-top: 4px; }
-#trekk-knappar button { flex: 1; padding: 6px; font: inherit; cursor: pointer; }
-#trekk-feil { color: #c00; font-size: 12px; }

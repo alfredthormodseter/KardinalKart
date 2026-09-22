@@ -60,7 +60,7 @@ export default function TrekkSheet() {
           lng: position.lng,
           staatid_dagar: Number(staatid),
           total_antall: totalNumber,
-          undermals_antall: undermalsNumber,
+          undermaals_antall: undermalsNumber,
           djupne: djupne === '' ? null : Number(djupne),
         }),
       })
@@ -88,7 +88,7 @@ export default function TrekkSheet() {
         }
       }}
     >
-      <SheetContent side="right" className="w-full sm:max-w-md">
+      <SheetContent side="right" className="z-[2001] h-full w-full sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Registrer trekk</SheetTitle>
           <SheetDescription>
