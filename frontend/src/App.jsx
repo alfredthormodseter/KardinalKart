@@ -27,7 +27,7 @@ function App() {
 
   return (
       <>
-          <Title>FangstPlot</Title>
+          <Title>KardinalKart</Title>
 
           <StatusMessage
               message={status.message}
