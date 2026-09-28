@@ -6,8 +6,6 @@ KardinalKart is an application designed to help recreational fishermen decide wh
 
 The recommendations are based on a combination of the user's previously registered catches and calculations inspired by local fishing knowledge. The results are visualized as a heatmap layered over a map of the fishing area selected by the user.
 
-> **KardinalKart** takes its name from the lobster's traditional nickname, *“the cardinal of the sea”*, while also referring to the cardinal directions used in navigation.
-
 ## How to use
 
 1. Open KardinalKart in your browser.
