@@ -68,6 +68,7 @@ def create_grid(req: PolygonRequest):
     }
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/resources", StaticFiles(directory="resources"), name="resources")
 
 if __name__ == "__main__":
     import uvicorn
