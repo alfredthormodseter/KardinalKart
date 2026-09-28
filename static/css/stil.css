@@ -23,13 +23,35 @@ html, body { height: 100%; margin: 0; }
     pointer-events: auto;
 }
 
-/* Valgfritt: lås Leaflet-kontroller mot siden også */
 .leaflet-control-container {
-    position: fixed;
-    inset: 0;
+    position: fixed !important;
+    inset: 0 !important;
     pointer-events: none;
+    z-index: 1000;
 }
 
-.leaflet-control-container .leaflet-control {
+.leaflet-control {
     pointer-events: auto;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+    position: fixed !important;
+    z-index: 1000;
+}
+
+.leaflet-top {
+    top: 0 !important;
+}
+
+.leaflet-bottom {
+    bottom: 0 !important;
+}
+
+.leaflet-left {
+    left: 0 !important;
+}
+
+.leaflet-right {
+    right: 0 !important;
 }

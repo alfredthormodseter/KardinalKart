@@ -43,6 +43,9 @@ async function lastGrid(ring) {
     sisteCeller = data.cells || []
     sisteMaks = data.maks_poeng || 0
     teiknGrid()
+    setTimeout(() => {
+        publishStatus('', '')
+    }, 2000)
   } catch (err) {
     publishStatus('Klarte ikkje laste varmekartet: ' + err.message, 'error')
     sisteCeller = []
