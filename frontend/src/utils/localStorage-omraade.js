@@ -1,19 +1,18 @@
+window.hentOmraade = hentOmraade;
+window.lagreOmraade = lagreOmraade;
+window.slettOmraade = slettOmraade;
+
 const OMRAADE_STORAGE_KEY = 'kardinalKart_omraade';
 
-function hentOmraade() {
+export function hentOmraade() {
     const data = localStorage.getItem(OMRAADE_STORAGE_KEY);
     return data ? JSON.parse(data) : null;
 }
 
-function lagreOmraade(coordinates) {
+export function lagreOmraade(coordinates) {
     localStorage.setItem(OMRAADE_STORAGE_KEY, JSON.stringify(coordinates));
 }
 
-function slettOmraade() {
+export function slettOmraade() {
     localStorage.removeItem(OMRAADE_STORAGE_KEY);
 }
-
-// Make available globally for vanilla JS
-window.hentOmraade = hentOmraade;
-window.lagreOmraade = lagreOmraade;
-window.slettOmraade = slettOmraade;

@@ -1,5 +1,5 @@
-import { hentOmraade, lagreOmraade } from './localStorage-omraade.js';
-import { lagreTrekk, hentAlleTrekk } from './indexeddb-trekk.js';
+hentOmraade()
+lagreOmraade()
 
 // Visalizes the saved polygon
 function visOmriss(ring) {

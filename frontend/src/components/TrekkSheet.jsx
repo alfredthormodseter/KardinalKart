@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { lagreTrekk, hentAlleTrekk } from '../../static/js/indexeddb-trekk.js'
+import { lagreTrekk, hentAlleTrekk } from '@/utils/indexeddb-trekk.js'
 import {
   Sheet,
   SheetContent,
