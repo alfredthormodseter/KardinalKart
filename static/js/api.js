@@ -1,4 +1,4 @@
-import { hentOmraade, lagre Omraade } from './localStorage-omraade.js';
+import { hentOmraade, lagreOmraade } from './localStorage-omraade.js';
 import { lagreTrekk, hentAlleTrekk } from './indexeddb-trekk.js';
 
 // Visalizes the saved polygon
@@ -54,7 +54,7 @@ map.on('draw:created', async function (e) {
 
     // Store locally in browser
     try {
-        lagre Omraade(ring);
+        lagreOmraade(ring);
     } catch (err) {
         console.warn('Klarte ikkje lagre området lokalt:', err);
     }

@@ -5,7 +5,7 @@ export function hentOmraade() {
     return data ? JSON.parse(data) : null;
 }
 
-export function lagre Omraade(coordinates) {
+export function lagreOmraade(coordinates) {
     localStorage.setItem(OMRAADE_STORAGE_KEY, JSON.stringify(coordinates));
 }
 
