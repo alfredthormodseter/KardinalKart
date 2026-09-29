@@ -4,14 +4,11 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from app.grid import hent_celler
 from app.kalkulering import score_celler
-from app.omraade import lag_tabell, hent_omraade, lagre_omraade
 from contextlib import asynccontextmanager
-from app.trekk import lag_tabell as lag_trekk_tabell, lagre_trekk
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    lag_tabell()
-    lag_trekk_tabell()
+    # Tables are no longer created here - data is stored client-side
     yield
 
 app = FastAPI(lifespan=lifespan)
@@ -31,24 +28,15 @@ class TrekkRequest(BaseModel):
 def post_trekk(req: TrekkRequest):
     if req.undermaals_antall > req.total_antall:
         raise HTTPException(400, "Undermåls kan ikkje vere fleire enn totalt.")
-    return {"trekk_id": lagre_trekk(**req.model_dump())}
+    # Generate trekk_id and return it - the client will store it
+    from datetime import datetime, timedelta, timezone
+    from uuid import uuid4
+    trekk_id = str(uuid4())
+    return {"trekk_id": trekk_id, "timestamp": datetime.now(timezone.utc).isoformat()}
 
 @app.get("/")
 async def read_root():
     return FileResponse("static/index.html")
-
-@app.get("/omraade")
-def get_omraade():
-    return {"coordinates": hent_omraade()}
-
-@app.put("/omraade")
-def put_omraade(req: PolygonRequest):
-    lagre_omraade(req.coordinates)
-    return {"ok": True}
-
-@app.get("/catches")
-def get_catches():
-    return {"catches": []}
 
 @app.post("/create-grid")
 def create_grid(req: PolygonRequest):
@@ -56,7 +44,6 @@ def create_grid(req: PolygonRequest):
         celler = hent_celler(req.coordinates)
         if isinstance(celler, dict) and "error" in celler:
             return {"status": celler["error"]}
-
         celler = score_celler(celler)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
