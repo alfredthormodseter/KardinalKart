@@ -1,6 +1,3 @@
-hentOmraade()
-lagreOmraade()
-
 // Visalizes the saved polygon
 function visOmriss(ring) {
     drawnItems.clearLayers();
