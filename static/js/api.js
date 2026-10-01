@@ -29,13 +29,28 @@ async function lastGrid(ring) {
             publishStatus(data.status, 'error')
             return
         }
+
+        const celler = Array.isArray(data.cells) ? data.cells : []
+        const harData = celler.some(c => (c.poeng ?? 0) > 0)
+
+        if (!celler.length || !harData) {
+            publishStatus('Ingen data for vald område.', 'error')
+            setTimeout(() => {
+                publishStatus('', '')
+            }, 5000)
+            sisteCeller = []
+            sisteMaks = 0
+            teiknGrid()
+            return
+        }
+
         publishStatus(data.status, 'success')
         sisteCeller = data.cells || []
         sisteMaks = data.maks_poeng || 0
         teiknGrid()
         setTimeout(() => {
             publishStatus('', '')
-        }, 2000)
+        }, 10000)
     } catch (err) {
         publishStatus('Klarte ikkje laste varmekartet: ' + err.message, 'error')
         sisteCeller = []
