@@ -35,7 +35,7 @@ async function lastGrid(ring) {
         teiknGrid()
         setTimeout(() => {
             publishStatus('', '')
-        }, 2000)
+        }, 10000)
     } catch (err) {
         publishStatus('Klarte ikkje laste varmekartet: ' + err.message, 'error')
         sisteCeller = []
