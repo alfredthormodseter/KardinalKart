@@ -2,7 +2,7 @@
 
 # KardinalKart
 
-KardinalKart is an application designed to help recreational fishermen decide where to set their lobster traps.
+KardinalKart is an application designed to help recreational fishermen decide where to set their lobster traps. Check it out on kardinalkart.no
 
 The recommendations are based on a combination of the user's previously registered catches and calculations inspired by local fishing knowledge. The results are visualized as a heatmap layered over a map of the fishing area selected by the user.
 
