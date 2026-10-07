@@ -90,92 +90,6 @@ classDiagram
     GridCell "*" --> "1" Heatmap : is displayed in
 ```
 
-## How to run it
-
-### Prerequisites
-
-- Python 3.10 or newer
-- Node.js and npm
-- Docker and Docker Compose
-- A PostgreSQL database with PostGIS support
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/alfredthormodseter/FangstPlot.git
-cd FangstPlot
-```
-
-### 2. Start the PostGIS database
-
-Create a local environment file:
-
-```bash
-cp .env.example .env
-```
-
-On Windows PowerShell, use:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Update `.env` with your database connection details:
-
-```dotenv
-DB_URL=postgresql+psycopg://user:password@localhost:5432/fangstplot
-DB_USER=user
-DB_PASSWORD=password
-```
-
-Start the database:
-
-```bash
-docker compose up -d
-```
-
-### 3. Install backend dependencies
-
-Install the Python packages required by the backend:
-
-```bash
-pip install fastapi uvicorn sqlalchemy psycopg[binary] python-dotenv
-```
-
-### 4. Install and run the frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-For a production frontend build:
-
-```bash
-npm run build
-```
-
-### 5. Start the backend
-
-From the project root:
-
-```bash
-python -m uvicorn app.main:app --reload
-```
-
-The backend will be available at:
-
-```text
-http://localhost:8000
-```
-
-The interactive API documentation is available at:
-
-```text
-http://localhost:8000/docs
-```
-
 ## Data sources and calculations
 
 KardinalKart combines user-generated catch data with geographic and bathymetric data.
@@ -194,7 +108,7 @@ Catch records are stored in PostgreSQL with geographic coordinates using PostGIS
 
 The selected fishing area is also stored as a geographic polygon. This makes it possible to save and reuse the user's local fishing area.
 
-### Geographic and bathymetric data
+### Geographic data
 
 The application uses geographic data from Kartverket and bathymetric data stored in PostGIS. The database contains information such as:
 
