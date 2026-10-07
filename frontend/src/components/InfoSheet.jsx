@@ -16,7 +16,7 @@ export default function InfoSheet() {
                     <Button
                         variant="secondary"
                         size="icon-lg"
-                        className="fixed top-4 right-4 z-[2002] rounded-full shadow-md sm:size-7"
+                        className="fixed top-4 right-4 z-[2002] rounded-full shadow-md size-12 sm:size-9"
                         aria-label="Opne informasjon"
                         title="Informasjon"
                     />

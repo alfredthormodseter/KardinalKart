@@ -55,3 +55,32 @@ html, body { height: 100%; margin: 0; }
 .leaflet-right {
     right: 0 !important;
 }
+
+@media (max-width: 768px) {
+    .leaflet-touch .leaflet-bar a,
+    .leaflet-touch .leaflet-control-zoom-in,
+    .leaflet-touch .leaflet-control-zoom-out,
+    .leaflet-touch .leaflet-draw-toolbar a,
+    .leaflet-bar a,
+    .leaflet-draw-toolbar a {
+        width: 44px !important;
+        height: 44px !important;
+        line-height: 44px !important;
+    }
+
+    .leaflet-control-zoom-in,
+    .leaflet-control-zoom-out {
+        font-size: 24px !important;
+    }
+
+    .leaflet-draw-toolbar a {
+        background-size: 540px 30px !important;
+    }
+
+    .leaflet-editing-icon {
+        width: 22px !important;
+        height: 22px !important;
+        margin-left: -11px !important;
+        margin-top: -11px !important;
+    }
+}
