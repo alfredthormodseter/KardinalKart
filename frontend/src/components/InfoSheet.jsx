@@ -15,8 +15,8 @@ export default function InfoSheet() {
                 render={
                     <Button
                         variant="secondary"
-                        size="icon-sm"
-                        className="fixed top-4 right-4 z-[2002] rounded-full shadow-md"
+                        size="icon-lg"
+                        className="fixed top-4 right-4 z-[2002] rounded-full shadow-md sm:size-7"
                         aria-label="Opne informasjon"
                         title="Informasjon"
                     />
