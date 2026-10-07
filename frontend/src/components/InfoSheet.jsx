@@ -25,17 +25,40 @@ export default function InfoSheet() {
                 <InfoIcon />
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-[92vw] sm:max-w-md">
+            <SheetContent side="right" showCloseButton={false} initialFocus={false} className="w-[92vw] sm:max-w-md max-h-[calc(100vh)] overflow-y-auto">
                 <SheetHeader>
                     <SheetTitle>Om</SheetTitle>
                 </SheetHeader>
 
                 <div className="space-y-3 px-4 pb-5 text-sm leading-relaxed">
                     <p>
-                        KardinalKart er eit kart med funksjonen å laste inn eit varmekart over kvar det er sansyn for hummar, og då ei anbefaling av kvar teinene dine bør setjast. Kartet baserast på geodata frå Karverket, og skal gi ei rettleiing for fiskarar som eller hadde skote i blinde. Varmekartet er meint å brukat saman med info om botntype, kjenskap til andre artar i nærleiken og lokale straumar. Det er for augeblikket berre data for Bømlo kommune, men heile Vestland er å venta i nær framtid.
+                        KardinalKart er eit kart med funksjonen å laste inn eit varmekart over kvar det er sansyn for å finne hummar, og då ei anbefaling om kvar teinene dine bør setjast. Kartet baserast på geodata frå Karverket, og skal gi ei rettleiing for fiskarar som eller hadde skote i blinde. Kombiner resultatet saman med lokal kunnskap som info om botntype, kjenskap til andre artar i nærleiken og lokale straumar.
                     </p>
                     <p>
-                        For å laste eit varmekart må du markere det område du ser på som aktuelt å setja teiner i. Du aktiverar teiknemodus ved å trykkje på figuren oppe i venstre hjørna. Deretter trykkar du på kartet for å lage omrisset. Omrisset har ei storleiksbegrensing på omtrent 20 km2. Eit område på 4-10 km2 er anbefalt for eit godt resultat. Varmekartet brukar rundt 20 sekund per km2 å laste inn.
+                        <strong>Slik brukar du KardinalKart:</strong>
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2">
+                        <li>
+                            Trykk på figuren øvst til venstre for å aktivere teiknemodus.
+                        </li>
+                        <li>
+                            Teikn området du ønskjer å undersøkje ved å klikke direkte på kartet og lage eit omriss.
+                        </li>
+                        <li>
+                            Området bør helst vere mellom 4 og 10 km² for best mogleg resultat, og kan ikkje vere større enn om lag 20 km².
+                        </li>
+                        <li>
+                            Når området er valt, vil varmekartet lastast inn og gi deg eit estimat for området du har markert.
+                        </li>
+                    </ul>
+                    <p>
+                        Per i dag er det berre tilgjengeleg data for Bømlo kommune, men resten av Vestland vil kome etter kvart.
+                    </p>
+                    <p>
+                        Spørsmål og innspel vert sette pris på og kan sendast til{' '}
+                        <a href="mailto:info@kardinalkart.no" className="underline">
+                            info@kardinalkart.no
+                        </a>.
                     </p>
                 </div>
             </SheetContent>
