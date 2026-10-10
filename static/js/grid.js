@@ -1,4 +1,4 @@
-// Varmekart-rendering
+var visVarmekart = true;
 
 var KANTLENGD_M = 30;
 
@@ -78,6 +78,22 @@ function varmepunkt() {
         });
 }
 
+var visVarmekart = true;
+
+function oppdaterVarmekartSynleg() {
+    if (!varmelag) return;
+    if (visVarmekart) {
+        if (!map.hasLayer(varmelag)) varmelag.addTo(map);
+    } else if (map.hasLayer(varmelag)) {
+        map.removeLayer(varmelag);
+    }
+}
+
+window.addEventListener('varmekart-toggle', function (e) {
+    visVarmekart = e.detail.visible;
+    oppdaterVarmekartSynleg();
+});
+
 function teiknGrid() {
     if (varmelag) {
         map.removeLayer(varmelag);
@@ -94,7 +110,9 @@ function teiknGrid() {
         minOpacity: 0.12,
         maxZoom: map.getZoom(),
         gradient: GRADIENT
-    }).addTo(map);
+    });
+
+    oppdaterVarmekartSynleg();
 }
 
 map.on('zoomend', function () {
