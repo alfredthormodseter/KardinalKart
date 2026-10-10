@@ -32,7 +32,7 @@ export default function InfoSheet() {
 
                 <div className="space-y-3 px-4 pb-5 text-sm leading-relaxed">
                     <p>
-                        KardinalKart er eit kart med funksjonen å laste inn eit varmekart over kvar det er sannsyn for å finne hummar, og då ei anbefaling om kvar teinene dine bør setjast. Kartet baserast på geodata frå Kartverket, og skal gi ei rettleiing for fiskarar som ellers hadde skote i blinde. Kombiner resultatet saman med lokal kunnskap som info om botntype, kjenskap til andre artar i nærleiken og lokale straumar.
+                        KardinalKart er eit kart med moglegheit for å laste inn eit varmekart over kvar det er sannsyn for å finne hummar, og då ei anbefaling om kvar teinene dine bør setjast. Kartet baserast på geodata frå Kartverket, og skal gi ei rettleiing for fiskarar som ellers hadde skote i blinde. Kombiner resultatet saman med lokal kunnskap som info om botntype, kjenskap til andre artar i nærleiken og lokale straumar.
                     </p>
                     <p>
                         <strong>Slik brukar du KardinalKart:</strong>
