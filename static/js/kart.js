@@ -15,14 +15,14 @@ var sjoKart = L.tileLayer(
 );
 
 window.addEventListener('sjoKart-toggle', function (e) {
-    visSvartKvitt = e.detail.svartKvitt;
+    var visSjokart = e.detail.svartKvitt;
 
-    if (visSvartKvitt) {
-        if (map.hasLayer(sjoKart)) map.removeLayer(sjoKart);
-        if (!map.hasLayer(svartKvittKart)) svartKvittKart.addTo(map);
-    } else {
+    if (visSjokart) {
         if (map.hasLayer(svartKvittKart)) map.removeLayer(svartKvittKart);
         if (!map.hasLayer(sjoKart)) sjoKart.addTo(map);
+    } else {
+        if (map.hasLayer(sjoKart)) map.removeLayer(sjoKart);
+        if (!map.hasLayer(svartKvittKart)) svartKvittKart.addTo(map);
     }
 });
 
