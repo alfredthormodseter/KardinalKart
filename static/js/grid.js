@@ -90,12 +90,25 @@ function varmepunkt() {
         });
 }
 
-var visVarmekart = true;
-
 function oppdaterVarmekartSynleg() {
     if (!varmelag) return;
+
     if (visVarmekart) {
-        if (!map.hasLayer(varmelag)) varmelag.addTo(map);
+        if (!map.hasLayer(varmelag)) {
+            // Fjern og legg til på nytt med nye parametrar
+            map.removeLayer(varmelag);
+
+            var p = varmeparametrar();
+            varmelag = L.heatLayer(varmepunkt(), {
+                pane: 'heatPane',
+                radius: p.radius,
+                blur: p.blur,
+                max: p.max,
+                minOpacity: 0.12,
+                maxZoom: map.getZoom(),
+                gradient: GRADIENT
+            }).addTo(map);
+        }
     } else if (map.hasLayer(varmelag)) {
         map.removeLayer(varmelag);
     }
