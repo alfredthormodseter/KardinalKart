@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Tables are no longer created here - data is stored client-side
+
     yield
 
 app = FastAPI(lifespan=lifespan)

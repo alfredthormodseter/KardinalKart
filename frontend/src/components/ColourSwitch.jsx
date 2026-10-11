@@ -1,13 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 
 export default function ColourSwitch() {
-    const [isChecked, setIsChecked] = useState(true)
+    const [isChecked, setIsChecked] = useState(false)
+
+    useEffect(() => {
+        window.dispatchEvent(
+            new CustomEvent('sjoKart-toggle', { detail: { svartKvitt: isChecked } })
+        )
+    }, [isChecked])
+
     return (
         <div className="flex flex-col items-center gap-0">
-            <Label htmlFor="fargekart" className="text-[10px] text-[#0f172a]">Svart-kvitt</Label>
-            <Switch id="fargekart checked={isChecked} onCheckedChange={setIsChecked}"/>
+            <Label htmlFor="sjokart" className="text-[10px] text-[#0f172a]">Sjøkart</Label>
+            <Switch id="sjokart" checked={isChecked} onCheckedChange={setIsChecked} />
         </div>
     )
 }

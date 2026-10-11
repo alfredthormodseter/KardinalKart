@@ -9,7 +9,7 @@ var sisteCeller = [];
 var sisteMaks = 0;
 
 var MIN_RADIUS_PX = 6;
-var BASE_MAX = 3.0;
+var BASE_MAX = 1.6;
 
 var GRADIENT = {
     0.22: '#0000ff',
