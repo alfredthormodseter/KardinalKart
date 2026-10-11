@@ -3,6 +3,7 @@ import StatusMessage from './components/StatusMessage'
 import Title from './components/Title'
 import TrekkSheet from './components/TrekkSheet'
 import InfoSheet from './components/InfoSheet'
+import MapSettings from './components/MapSettings'
 
 function App() {
   const [status, setStatus] = useState({
@@ -34,6 +35,8 @@ function App() {
               message={status.message}
               type={status.type}
           />
+
+          <MapSettings />
 
           <InfoSheet />
           <TrekkSheet />

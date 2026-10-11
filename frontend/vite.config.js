@@ -24,9 +24,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/create-grid': 'http://127.0.0.1:8000',
-      '/omraade': 'http://127.0.0.1:8000',
-      '/trekk': 'http://127.0.0.1:8000',
+      '^/(?!static)': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
     },
   },
 })

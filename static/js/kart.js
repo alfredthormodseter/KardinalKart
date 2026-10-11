@@ -2,12 +2,35 @@
 
 var map = L.map('map').setView([59.75, 5.25], 11);
 
-L.tileLayer(
-    'https://cache.kartverket.no/v1/wmts/1.0.0/topograatone/default/webmercator/{z}/{y}/{x}.png',
-    { attribution: '&copy; <a href="http://www.kartverket.no/">Kartverket</a>' }
-).addTo(map);
+var attribusjon = '&copy; <a href="http://www.kartverket.no/">Kartverket</a>';
 
-// Varmekartet ligg oppå og slepp musepeikaren gjennom til hexane.
+var svartKvittKart = L.tileLayer(
+    'https://cache.kartverket.no/v1/wmts/1.0.0/topograatone/default/webmercator/{z}/{y}/{x}.png',
+    { attribution: attribusjon }
+);
+
+var sjoKart = L.tileLayer(
+    'https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png',
+    { attribution: attribusjon }
+);
+
+window.addEventListener('sjoKart-toggle', function (e) {
+    visSvartKvitt = e.detail.svartKvitt;
+
+    if (visSvartKvitt) {
+        if (map.hasLayer(sjoKart)) map.removeLayer(sjoKart);
+        if (!map.hasLayer(svartKvittKart)) svartKvittKart.addTo(map);
+    } else {
+        if (map.hasLayer(svartKvittKart)) map.removeLayer(svartKvittKart);
+        if (!map.hasLayer(sjoKart)) sjoKart.addTo(map);
+    }
+});
+
+var visSvartKvitt = true;
+svartKvittKart.addTo(map);
+
+
+
 map.createPane('heatPane');
 var heatPane = map.getPane('heatPane');
 heatPane.style.zIndex = 360;

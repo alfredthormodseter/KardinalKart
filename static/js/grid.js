@@ -1,4 +1,4 @@
-// Varmekart-rendering
+var visVarmekart = true;
 
 var KANTLENGD_M = 30;
 
@@ -7,6 +7,9 @@ var RADIUSFAKTOR = 1.4;
 var varmelag = null;
 var sisteCeller = [];
 var sisteMaks = 0;
+
+var MIN_RADIUS_PX = 6;
+var BASE_MAX = 1.6;
 
 var GRADIENT = {
     0.22: '#0000ff',
@@ -27,10 +30,19 @@ function pikslarPerMeter() {
     return px / meter;
 }
 
-function varmeradius() {
+function varmeparametrar() {
     // Senteravstand mellom nabohexar = kantlengd * sqrt(3).
     var senteravstandPx = pikslarPerMeter() * KANTLENGD_M * 1.732;
-    return Math.max(6, senteravstandPx * RADIUSFAKTOR);
+    var onsketRadius = senteravstandPx * RADIUSFAKTOR;
+    var radius = Math.max(MIN_RADIUS_PX, onsketRadius);
+
+    var overlapp = radius / onsketRadius;
+
+    return {
+        radius: radius,
+        blur: radius * 0.9,
+        max: BASE_MAX * overlapp * overlapp
+    };
 }
 
 function sentroide(geom) {
@@ -78,6 +90,35 @@ function varmepunkt() {
         });
 }
 
+function oppdaterVarmekartSynleg() {
+    if (!varmelag) return;
+
+    if (visVarmekart) {
+        if (!map.hasLayer(varmelag)) {
+            // Fjern og legg til på nytt med nye parametrar
+            map.removeLayer(varmelag);
+
+            var p = varmeparametrar();
+            varmelag = L.heatLayer(varmepunkt(), {
+                pane: 'heatPane',
+                radius: p.radius,
+                blur: p.blur,
+                max: p.max,
+                minOpacity: 0.12,
+                maxZoom: map.getZoom(),
+                gradient: GRADIENT
+            }).addTo(map);
+        }
+    } else if (map.hasLayer(varmelag)) {
+        map.removeLayer(varmelag);
+    }
+}
+
+window.addEventListener('varmekart-toggle', function (e) {
+    visVarmekart = e.detail.visible;
+    oppdaterVarmekartSynleg();
+});
+
 function teiknGrid() {
     if (varmelag) {
         map.removeLayer(varmelag);
@@ -86,29 +127,33 @@ function teiknGrid() {
 
     if (!sisteCeller.length) return;
 
+    var p = varmeparametrar();
+
     varmelag = L.heatLayer(varmepunkt(), {
         pane: 'heatPane',
-        radius: varmeradius(),
-        blur: varmeradius() * 0.9,
-        max: 1.6,
+        radius: p.radius,
+        blur: p.blur,
+        max: p.max,
         minOpacity: 0.12,
         maxZoom: map.getZoom(),
         gradient: GRADIENT
-    }).addTo(map);
+    });
+
+    oppdaterVarmekartSynleg();
 }
 
 map.on('zoomend', function () {
     if (!varmelag || !map.hasLayer(varmelag)) return;
 
-    var r = varmeradius();
+    var p = varmeparametrar();
 
-    // Vent til Leaflet er ferdig med zoom-renderinga.
     requestAnimationFrame(function () {
         if (!varmelag || !map.hasLayer(varmelag)) return;
 
         varmelag.setOptions({
-            radius: r,
-            blur: r * 0.9,
+            radius: p.radius,
+            blur: p.blur,
+            max: p.max,
             maxZoom: map.getZoom()
         });
     });
