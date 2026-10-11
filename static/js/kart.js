@@ -14,7 +14,7 @@ var sjoKart = L.tileLayer(
     { attribution: attribusjon }
 );
 
-window.addEventListener('sjokart-toggle', function (e) {
+window.addEventListener('sjoKart-toggle', function (e) {
     visSvartKvitt = e.detail.svartKvitt;
 
     if (visSvartKvitt) {
