@@ -56,6 +56,20 @@ html, body { height: 100%; margin: 0; }
     right: 0 !important;
 }
 
+.live-areal-tooltip {
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    box-shadow: none;
+    font-weight: 600;
+    padding: 4px 8px;
+}
+
+.leaflet-draw-tooltip {
+    display: none !important;
+}
+
 @media (max-width: 768px) {
 
     .leaflet-control-zoom-in,

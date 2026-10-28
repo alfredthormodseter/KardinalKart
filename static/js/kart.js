@@ -1,5 +1,7 @@
 // Kart, kartlag, panes og teiknekontroll.
 
+window.type = true;
+
 var map = L.map('map').setView([59.75, 5.25], 11);
 
 var attribusjon = '&copy; <a href="http://www.kartverket.no/">Kartverket</a>';
@@ -39,11 +41,70 @@ heatPane.style.pointerEvents = 'none';
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
-map.addControl(new L.Control.Draw({
+L.drawLocal.draw.handlers.polygon.tooltip = {
+    start: '',
+    cont: '',
+    end: ''
+};
+
+var drawControl = new L.Control.Draw({
     edit: { featureGroup: drawnItems, edit: false, remove: false },
     draw: {
-        polygon: { shapeOptions: { color: '#000', weight: 1, fill: false, fillOpacity: 0 } },
+        polygon: {
+            showArea: false, // vi viser areal sjølve
+            allowIntersection: false,
+            shapeOptions: { color: '#000', weight: 1, fill: false }
+        },
         polyline: false, rectangle: false,
         circle: false, marker: false, circlemarker: false
     }
-}));
+});
+map.addControl(drawControl);
+
+// ---- Live areal: musa er neste hjørne ----
+var liveArealTooltip = null;
+
+function formatAreal(m2) {
+    return (m2 / 1000000).toFixed(2).replace('.', ',') + ' km²';
+}
+
+function polygonHandler() {
+    return drawControl._toolbars.draw._modes.polygon.handler;
+}
+
+function oppdaterLiveAreal(e) {
+    var h = polygonHandler();
+    if (!h || !h._poly) return;
+
+    var plasserte = h._poly.getLatLngs();        // flat liste med faste punkt
+    if (plasserte.length < 2) return;            // treng 2 faste punkt
+
+    var ring = plasserte.concat([e.latlng]);     // + musa som 3. (neste) hjørne
+    var areal = L.GeometryUtil.geodesicArea(ring);
+
+    if (!liveArealTooltip) {
+        liveArealTooltip = L.tooltip({
+            permanent: true,
+            direction: 'right',
+            offset: [18, 0],
+            className: 'live-areal-tooltip'
+        });
+        liveArealTooltip.setLatLng(e.latlng).addTo(map);
+    }
+    liveArealTooltip.setLatLng(e.latlng).setContent('Areal: ' + formatAreal(areal));
+}
+
+function fjernLiveAreal() {
+    map.off('mousemove', oppdaterLiveAreal);
+    if (liveArealTooltip) {
+        map.removeLayer(liveArealTooltip);
+        liveArealTooltip = null;
+    }
+}
+
+map.on('draw:drawstart', function (e) {
+    if (e.layerType !== 'polygon') return;
+    map.on('mousemove', oppdaterLiveAreal);
+});
+map.on('draw:drawstop', fjernLiveAreal);
+map.on('draw:created', fjernLiveAreal);
