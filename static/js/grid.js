@@ -82,10 +82,10 @@ function getCoordinates() {
 
 function varmepunkt() {
     return sisteCeller
-        .filter(function (c) { return c.poeng > 0; })
+        .filter(function (c) { return c.poeng > 0 || c.easter_egg; })
         .map(function (c) {
             var s = sentroide(c.geom);
-            var t = c.poeng / sisteMaks;
+            var t = c.easter_egg ? 1 : c.poeng / sisteMaks;
             return [s[0], s[1], t * t];
         });
 }
@@ -184,6 +184,14 @@ map.on('click', function (e) {
     });
 
     if (!best || minDist > KANTLENGD_M * 1.5) return;
+
+    if (best.easter_egg) {
+        popup
+            .setLatLng(e.latlng)
+            .setContent('<b>Sjølvsagt er det hummar i hummarparken.</b>')
+            .openOn(map);
+        return;
+    }
 
     popup
         .setLatLng(e.latlng)

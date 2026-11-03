@@ -31,7 +31,7 @@ async function lastGrid(ring) {
         }
 
         const celler = Array.isArray(data.cells) ? data.cells : []
-        const harData = celler.some(c => (c.poeng ?? 0) > 0)
+        const harData = celler.some(c => (c.poeng ?? 0) > 0 || c.easter_egg)
 
         if (!celler.length || !harData) {
             publishStatus('Ingen data for vald område.', 'error')

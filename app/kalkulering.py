@@ -1,4 +1,13 @@
 from enum import IntEnum
+from shapely.geometry import Polygon, shape
+
+HUMMERPARK = Polygon([
+    (5.143513164374793, 59.58656914017467),
+    (5.142805708455526, 59.58617748274143),
+    (5.143114208191603, 59.5858588982916),
+    (5.143507157374716, 59.58630965099751),
+    (5.143513164374793, 59.58656914017467),
+])
 
 VEKTER = {
     "djupne": 2.0,
@@ -50,6 +59,8 @@ assert DELPOENG_NOKLAR == VEKTER.keys(), (
     f"Mismatch: {DELPOENG_NOKLAR ^ VEKTER.keys()}"
 )
 
+def er_hummerpark(celle: dict) -> bool:
+    return HUMMERPARK.intersects(shape(celle["geom"]))
 
 def depth_score(depth: float | None) -> float:
     if depth is None:
@@ -94,6 +105,15 @@ def ly_score(landdel_nv: float | None) -> float:
     return min(1.0, float(landdel_nv) * 1.5)
 
 def celle_score(celle: dict) -> dict:
+
+    if er_hummerpark(celle):
+        return {
+            **celle,
+            "poeng": 0.0,
+            "delpoeng": {k: 0.0 for k in DELPOENG_NOKLAR},
+            "easter_egg": True,
+        }
+
     djupne = celle.get("djupne")
     # Land eller fjøresone - ingen poeng uansett andre signal
     if djupne is None or abs(float(djupne)) < MIN_DEPTH:
