@@ -44,7 +44,6 @@ class Dybdetype(IntEnum):
     DYPPUNKT = 5
     KAIPUNKT = 6
 
-#Les kvar hummaren likar seg og ranger botntypane etter sådan:
 PUNKT_VEKT = {
     Dybdetype.SADELPUNKT: 0.5,
     Dybdetype.SNAGPUNKT: 1.0,
@@ -71,7 +70,6 @@ def depth_score(depth: float | None) -> float:
             return score
     return 0.0
 
-#Funksjonen summar opp skåren til alle punkta i cella, vurder å endre skalaen til at score forblir mellom 0 og 1
 def punkt_score(punkt: list) -> float:
     score = 0.0
     for p in punkt:
