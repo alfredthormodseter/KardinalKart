@@ -1,4 +1,4 @@
-![](./resources/coverimage.png)
+![](./resources/og-bilete.png)
 
 # KardinalKart
 
