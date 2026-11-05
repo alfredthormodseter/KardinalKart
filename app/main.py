@@ -38,6 +38,12 @@ def post_trekk(req: TrekkRequest):
 async def read_root():
     return FileResponse("static/index.html")
 
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("resources/favicon.ico")
+
+app.mount("/resources", StaticFiles(directory="resources"), name="resources")
+
 @app.post("/create-grid")
 def create_grid(req: PolygonRequest):
     try:
