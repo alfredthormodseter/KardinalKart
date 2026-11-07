@@ -26,7 +26,13 @@ async function lastGrid(ring) {
             throw new Error(data.detail || ('HTTP ' + svar.status))
         }
         if (data.error) {
-            publishStatus(data.status, 'error')
+            publishStatus(data.error, 'error')
+            sisteCeller = []
+            sisteMaks = 0
+            teiknGrid()
+            setTimeout(() => {
+                publishStatus('', '')
+            }, 5000)
             return
         }
 
