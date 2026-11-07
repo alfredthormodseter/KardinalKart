@@ -2,7 +2,11 @@
 
 window.type = true;
 
-var map = L.map('map').setView([59.75, 5.25], 11);
+var startposisjon = window.location.pathname.replace(/\/+$/, '') === '/joa'
+    ? [64.6481, 11.2096]
+    : [59.75, 5.25];
+
+var map = L.map('map').setView(startposisjon, 11);
 
 var attribusjon = '&copy; <a href="http://www.kartverket.no/">Kartverket</a>';
 

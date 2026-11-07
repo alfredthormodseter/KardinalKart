@@ -35,6 +35,8 @@ def post_trekk(req: TrekkRequest):
     return {"trekk_id": trekk_id, "timestamp": datetime.now(timezone.utc).isoformat()}
 
 @app.get("/")
+@app.get("/bomlo")
+@app.get("/joa")
 async def read_root():
     return FileResponse("static/index.html")
 
@@ -49,7 +51,7 @@ def create_grid(req: PolygonRequest):
     try:
         celler = hent_celler(req.coordinates)
         if isinstance(celler, dict) and "error" in celler:
-            return {"status": celler["error"]}
+            return celler
         celler = score_celler(celler)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
