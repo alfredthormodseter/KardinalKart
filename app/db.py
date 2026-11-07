@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 
 load_dotenv()
 
@@ -12,4 +13,4 @@ for prefix in ("postgres://", "postgresql://"):
         DB_URL = "postgresql+psycopg://" + DB_URL[len(prefix):]
         break
 
-engine = create_engine(DB_URL)
+engine = create_engine(DATABASE_URL, poolclass=NullPool, pool_pre_ping=True)
