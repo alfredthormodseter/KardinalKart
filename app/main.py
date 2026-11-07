@@ -35,6 +35,8 @@ def post_trekk(req: TrekkRequest):
     return {"trekk_id": trekk_id, "timestamp": datetime.now(timezone.utc).isoformat()}
 
 @app.get("/")
+@app.get("/bomlo")
+@app.get("/joa")
 async def read_root():
     return FileResponse("static/index.html")
 
